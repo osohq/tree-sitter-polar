@@ -1,0 +1,30 @@
+===
+Populated Actor
+===
+
+actor User {
+  roles = ["reader", "writer"]
+  relations = { parent: Organization };
+}
+
+---
+
+(source_file
+  (resource_block
+    (resource_type)
+    (namespaced_identifier)
+    (term
+      (declaration
+        (assignment_operator)
+        (list
+          (term
+            (string))
+          (term
+            (string)))))
+    (term
+      (declaration
+        (assignment_operator)
+        (dict
+          (dict_field
+            (identifier)
+            (namespaced_identifier)))))))

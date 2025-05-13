@@ -1,0 +1,12 @@
+===
+Empty resource
+===
+
+resource Organization {}
+
+---
+
+(source_file
+  (resource_block
+    (resource_type)
+    (namespaced_identifier)))

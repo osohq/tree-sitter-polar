@@ -1,0 +1,48 @@
+===
+Test block
+===
+
+test "Organization" {
+  # comment
+  setup {
+    has_role(User{"alice"}, "viewer", Organization{"example"});
+    has_role(User{"bob"}, "owner", Organization{"example"});
+  }
+}
+
+---
+
+(source_file
+  (test_block
+    (test_header
+      (string))
+    (comment)
+    (test_setup
+      (rule
+        (rule_functor
+          (namespaced_identifier)
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (string)))
+          (term
+            (string))
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (string)))))
+      (rule)
+      (rule
+        (rule_functor
+          (namespaced_identifier)
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (string)))
+          (term
+            (string))
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (string)))))
+      (rule))))

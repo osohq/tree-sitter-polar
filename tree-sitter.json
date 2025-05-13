@@ -1,0 +1,36 @@
+{
+  "grammars": [
+    {
+      "name": "polar",
+      "camelcase": "Polar",
+      "scope": "source.polar",
+      "path": ".",
+      "file-types": ["polar"],
+      "injection-regex": "^polar$",
+      "highlights": "queries/highlights.scm",
+      "tags": "queries/tags.scm"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "license": "Apache 2.0",
+    "description": "A declarative logic programming language specialized for authorization logic.",
+    "authors": [
+      {
+        "name": "Aru Sahni",
+        "email": "aru@osohq.com"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/arusahni/tree-sitter-polar"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true
+  }
+}
