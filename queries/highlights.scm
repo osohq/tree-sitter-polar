@@ -27,16 +27,22 @@
 (operator) @operator
 (rule_functor name: (namespaced_identifier) @function)
 (rule_functor
-  parameters: (specializer
-    name: (namespaced_identifier) @variable))
+  parameters: (_)* (specializer
+    name: (namespaced_identifier) @variable.parameter))
+(rule_functor
+  parameters: (_)* (specializer
+    type: (namespaced_identifier) @type))
 (rule_expression_functor name: (namespaced_identifier) @function.call)
 (rule_expression_functor
   parameters: (identifier) @variable)
+(object_literal
+  name: (namespaced_identifier) @type)
 (comment) @comment
 
 ; test stuff
 (test_header "test" @module)
-(test_header name: (string) @comment)
+(test_header name: (string) @label)
 (test_setup "setup" @module)
+(test_setup (test_fact name: (namespaced_identifier) @function))
 
-(test_block keyword: ["assert" "assert_not"] @keyword)
+; (test_block keyword: ["assert" "assert_not"] @keyword)
