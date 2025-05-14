@@ -76,7 +76,9 @@ module.exports = grammar({
       seq(
         $.rule_functor,
         "if",
+        repeat($.comment),
         $.rule_expression_functor,
+        repeat($.comment),
         repeat(seq(choice("and", "or"), $.rule_expression_functor)),
         ";",
       ),
@@ -155,6 +157,9 @@ module.exports = grammar({
 
     inline_query: ($) => seq("?=", $.term, ";"),
 
+    shorthand_rule: ($) =>
+      seq($.string, "if", choice(repeat($.term), $.rule_expression_functor), ";"),
+
     resource_block: ($) =>
       seq(
         optional(field("identifier", $.namespaced_identifier)),
@@ -172,7 +177,16 @@ module.exports = grammar({
           "global",
         ),
         field("scope_start", "{"),
-        optional(repeat(choice(";", $.relation_declaration, $.term))),
+        repeat(
+          seq(
+            choice(
+              seq($.relation_declaration, field("expression_end", ";")),
+              seq($.declaration, field("expression_end", ";")),
+              $.shorthand_rule,
+              $.comment,
+            ),
+          ),
+        ),
         field("scope_end", "}"),
       ),
 

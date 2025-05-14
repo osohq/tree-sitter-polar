@@ -36,13 +36,13 @@ resource Repository {
 
   # contributors are also viewers
   # owners are also contributors
-  "viewer" if "contributor";
-  "contributor" if "owner";
-
+  "viewer" if "contributor"; "contributor" if "owner";
   # roles are inherited from the parent organization
   "viewer" if "viewer" on "parent";
   "owner" if "owner" on "parent";
 }
+
+has_permission(u: User, r: Repository) if o matches Organization and parent(r, o) and has_permission(u, o);
 
 # These are examples of how to test the Policy logic.
 # https://www.osohq.com/docs/guides/policy-tests
@@ -55,13 +55,10 @@ test "Organization roles and permissions" {
     has_role(User{"alice"}, "viewer", Organization{"example"});
     has_role(User{"bob"}, "owner", Organization{"example"});
   }
+
   # This is how we assert that a user is authorized 
   # to perform a particular action or not
-  assert     allow(User{"alice"}, "view", Organization{"example"});
-  assert     allow(User{"bob"}, "view", Organization{"example"});
-  assert_not allow(User{"alice"}, "edit", Organization{"example"});
-  assert     allow(User{"bob"}, "edit", Organization{"example"});
-}
+  assert     allow(User{"alice"}, "view", Organization{"example"}); assert     allow(User{"bob"}, "view", Organization{"example"}); assert_not allow(User{"alice"}, "edit", Organization{"example"}); assert     allow(User{"bob"}, "edit", Organization{"example"}); }
 
 test "Repository roles and permissions" {
   setup {

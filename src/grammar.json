@@ -364,8 +364,22 @@
           "value": "if"
         },
         {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "comment"
+          }
+        },
+        {
           "type": "SYMBOL",
           "name": "rule_expression_functor"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "comment"
+          }
         },
         {
           "type": "REPEAT",
@@ -823,6 +837,39 @@
         }
       ]
     },
+    "shorthand_rule": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "string"
+        },
+        {
+          "type": "STRING",
+          "value": "if"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "term"
+              }
+            },
+            {
+              "type": "SYMBOL",
+              "name": "rule_expression_functor"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
     "resource_block": {
       "type": "SEQ",
       "members": [
@@ -906,32 +953,59 @@
           }
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "REPEAT",
-              "content": {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
                 "type": "CHOICE",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": ";"
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "relation_declaration"
+                      },
+                      {
+                        "type": "FIELD",
+                        "name": "expression_end",
+                        "content": {
+                          "type": "STRING",
+                          "value": ";"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "declaration"
+                      },
+                      {
+                        "type": "FIELD",
+                        "name": "expression_end",
+                        "content": {
+                          "type": "STRING",
+                          "value": ";"
+                        }
+                      }
+                    ]
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "relation_declaration"
+                    "name": "shorthand_rule"
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "term"
+                    "name": "comment"
                   }
                 ]
               }
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+            ]
+          }
         },
         {
           "type": "FIELD",

@@ -35,6 +35,8 @@
 (rule_expression_functor name: (namespaced_identifier) @function.call)
 (rule_expression_functor
   parameters: (identifier) @variable)
+(dict_field
+  value: (namespaced_identifier) @type)
 (object_literal
   name: (namespaced_identifier) @type)
 (comment) @comment
@@ -44,5 +46,3 @@
 (test_header name: (string) @label)
 (test_setup "setup" @module)
 (test_setup (test_fact name: (namespaced_identifier) @function))
-
-; (test_block keyword: ["assert" "assert_not"] @keyword)
