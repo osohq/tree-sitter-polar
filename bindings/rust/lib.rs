@@ -40,6 +40,7 @@ pub const NODE_TYPES: &str = include_str!("../../src/node-types.json");
 // pub const INJECTIONS_QUERY: &str = include_str!("../../queries/injections.scm");
 // pub const LOCALS_QUERY: &str = include_str!("../../queries/locals.scm");
 // pub const TAGS_QUERY: &str = include_str!("../../queries/tags.scm");
+pub const FORMATTER_QUERY: &str = include_str!("../../queries/formatter.scm");
 
 #[cfg(test)]
 mod tests {
