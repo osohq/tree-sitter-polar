@@ -160,3 +160,22 @@ ln -s /path/to/tree-sitter-polar/queries/formatter.scm ~/.config/topiary/queries
    * Any additional positional args will be passed through to `topiary format`.
 3. Edit `formatter.scm`. The output from the `watchformat.sh` session will
    update when either the policy or format query files are updated.
+
+### Query Linting
+
+We use [ts_query_ls](https://github.com/ribru17/ts_query_ls) to format and
+validate tree-sitter queries.
+
+```sh
+# Lint queries
+make lintquery
+
+# Format queries
+make formatquery
+
+# Check queries for issues (lints and formats, used by CI)
+make checkquery
+
+# Do all of the above in order
+make query
+```

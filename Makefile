@@ -91,4 +91,53 @@ clean:
 test:
 	$(TS) test
 
-.PHONY: all install uninstall clean test
+wasm:
+	$(TS) build --wasm
+
+.PHONY: all install uninstall clean test wasm
+
+# Begin Tree-sitter LS config. Borrowed from
+#  https://github.com/nvim-treesitter/nvim-treesitter/blob/c6dd314086f7b471bf6c9110092a94ce1c06d220/Makefile
+ifeq ($(shell uname -s),Darwin)
+    NVIM_ARCH ?= macos-arm64
+    LUALS_ARCH ?= darwin-arm64
+    STYLUA_ARCH ?= macos-aarch64
+    RUST_ARCH ?= aarch64-apple-darwin
+else
+    NVIM_ARCH ?= linux-x86_64
+    LUALS_ARCH ?= linux-x64
+    STYLUA_ARCH ?= linux-x86_64
+    RUST_ARCH ?= x86_64-unknown-linux-gnu
+endif
+
+DEPDIR ?= .test-deps
+CURL ?= curl -sL --create-dirs
+
+TSQUERYLS := $(DEPDIR)/ts_query_ls-$(RUST_ARCH)
+TSQUERYLS_TARBALL := $(TSQUERYLS).tar.gz
+TSQUERYLS_URL := https://github.com/ribru17/ts_query_ls/releases/latest/download/$(notdir $(TSQUERYLS_TARBALL))
+
+.PHONY: tsqueryls
+tsqueryls: $(TSQUERYLS)
+
+$(TSQUERYLS):
+	$(CURL) $(TSQUERYLS_URL) -o $(TSQUERYLS_TARBALL)
+	mkdir $@
+	tar -xf $(TSQUERYLS_TARBALL) -C $@
+	rm -rf $(TSQUERYLS_TARBALL)
+
+.PHONY: query
+query: formatquery lintquery checkquery
+
+.PHONY: lintquery
+lintquery: $(TSQUERYLS) wasm
+	$(TSQUERYLS)/ts_query_ls lint queries
+
+.PHONY: formatquery
+formatquery: $(TSQUERYLS) wasm
+	$(TSQUERYLS)/ts_query_ls format queries
+
+.PHONY: checkquery
+checkquery: $(TSQUERYLS) wasm
+	$(TSQUERYLS)/ts_query_ls check -f queries
+# End Tree-sitter LS config.
