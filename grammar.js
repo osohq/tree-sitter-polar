@@ -79,7 +79,11 @@ module.exports = grammar({
         repeat($.comment),
         $.rule_expression_functor,
         repeat($.comment),
-        repeat(seq(choice("and", "or"), $.rule_expression_functor)),
+        repeat(seq(
+          choice("and", "or"),
+          repeat($.comment),
+          $.rule_expression_functor)
+        ),
         ";",
       ),
 
