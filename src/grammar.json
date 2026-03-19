@@ -25,6 +25,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "fact_declaration"
+          },
+          {
+            "type": "SYMBOL",
             "name": "inline_query"
           },
           {
@@ -730,21 +734,30 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SEQ",
+            "type": "CHOICE",
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "dict_field"
+                "name": "comment"
               },
               {
-                "type": "CHOICE",
+                "type": "SEQ",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": ","
+                    "type": "SYMBOL",
+                    "name": "dict_field"
                   },
                   {
-                    "type": "BLANK"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": ","
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
                   }
                 ]
               }
@@ -1157,7 +1170,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "test_fact"
+                "name": "fact_declaration"
               },
               {
                 "type": "SYMBOL",
@@ -1176,7 +1189,7 @@
         }
       ]
     },
-    "test_fact": {
+    "fact_declaration": {
       "type": "SEQ",
       "members": [
         {
@@ -1469,6 +1482,10 @@
     [
       "dict",
       "relation_declaration"
+    ],
+    [
+      "rule_functor",
+      "fact_declaration"
     ]
   ],
   "precedences": [
