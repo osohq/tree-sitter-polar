@@ -133,6 +133,40 @@
     }
   },
   {
+    "type": "fact_declaration",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "namespaced_identifier",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "object_literal",
+            "named": true
+          },
+          {
+            "type": "value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "fixture",
     "named": true,
     "fields": {},
@@ -529,6 +563,10 @@
           "named": true
         },
         {
+          "type": "fact_declaration",
+          "named": true
+        },
+        {
           "type": "inline_query",
           "named": true
         },
@@ -672,40 +710,6 @@
     }
   },
   {
-    "type": "test_fact",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "namespaced_identifier",
-            "named": true
-          }
-        ]
-      },
-      "parameters": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": ",",
-            "named": false
-          },
-          {
-            "type": "object_literal",
-            "named": true
-          },
-          {
-            "type": "value",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "test_header",
     "named": true,
     "fields": {
@@ -744,11 +748,11 @@
           "named": true
         },
         {
-          "type": "fixture",
+          "type": "fact_declaration",
           "named": true
         },
         {
-          "type": "test_fact",
+          "type": "fixture",
           "named": true
         }
       ]

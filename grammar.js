@@ -10,7 +10,7 @@
 module.exports = grammar({
   name: "polar",
 
-  conflicts: ($) => [[$.dict, $.relation_declaration]],
+  conflicts: ($) => [[$.dict, $.relation_declaration], [$.rule_functor, $.fact_declaration]],
   precedences: ($) => [[$.number, $.operator]],
 
   rules: {
@@ -21,6 +21,7 @@ module.exports = grammar({
           $.comment,
           $.rule_block,
           $.rule_type,
+          $.fact_declaration,
           $.inline_query,
           $.test_block,
         ),
@@ -209,9 +210,9 @@ module.exports = grammar({
     test_header: ($) => seq(field("keyword", "test"), field("name", $.string)),
 
     test_setup: ($) =>
-      seq("setup", "{", repeat(choice($.test_fact, $.comment, $.fixture)), "}"),
+      seq("setup", "{", repeat(choice($.fact_declaration, $.comment, $.fixture)), "}"),
 
-    test_fact: ($) =>
+    fact_declaration: ($) =>
       seq(
         field("name", $.namespaced_identifier),
         "(",
