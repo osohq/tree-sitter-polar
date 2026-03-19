@@ -144,7 +144,7 @@ module.exports = grammar({
 
     list: ($) => seq("[", repeat(choice($.term, ",")), "]"),
 
-    dict: ($) => seq("{", repeat(seq($.dict_field, optional(","))), "}"),
+    dict: ($) => seq("{", repeat(choice($.comment, seq($.dict_field, optional(",")))), "}"),
     dict_field: ($) =>
       seq(
         field("key", $.identifier),
