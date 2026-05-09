@@ -4,7 +4,7 @@
     "named": true,
     "fields": {
       "keyword": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
@@ -14,6 +14,28 @@
           {
             "type": "assert_not",
             "named": false
+          },
+          {
+            "type": "iff",
+            "named": false
+          },
+          {
+            "type": "in",
+            "named": false
+          },
+          {
+            "type": "not in",
+            "named": false
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "namespaced_identifier",
+            "named": true
           }
         ]
       },
@@ -27,6 +49,10 @@
           },
           {
             "type": "object_literal",
+            "named": true
+          },
+          {
+            "type": "specializer",
             "named": true
           },
           {
@@ -45,6 +71,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "list",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -932,6 +968,10 @@
     "named": false
   },
   {
+    "type": "iff",
+    "named": false
+  },
+  {
     "type": "in",
     "named": false
   },
@@ -945,6 +985,10 @@
   },
   {
     "type": "not",
+    "named": false
+  },
+  {
+    "type": "not in",
     "named": false
   },
   {

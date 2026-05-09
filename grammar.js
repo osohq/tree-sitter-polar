@@ -62,6 +62,7 @@ module.exports = grammar({
         "in",
         "forall",
         "if",
+        "iff",
         "and",
         "of",
         "not",
@@ -261,11 +262,19 @@ module.exports = grammar({
         field(
           "parameters",
           seq(
-            choice($.object_literal, $.value),
-            repeat(seq(",", choice($.object_literal, $.value))),
+            choice($.object_literal, $.specializer, $.value),
+            repeat(seq(",", choice($.object_literal, $.specializer, $.value))),
           ),
         ),
         ")",
+        optional(
+          seq(
+            field("keyword", "iff"),
+            field("name", $.namespaced_identifier),
+            field("keyword", choice("in", "not in")),
+            $.list,
+          ),
+        ),
         ";",
       ),
 
