@@ -13,6 +13,7 @@ module.exports = grammar({
   conflicts: ($) => [
     [$.dict, $.relation_declaration],
     [$.rule_functor, $.fact_declaration],
+    [$.keyword, $.rule_expression_functor],
   ],
   precedences: ($) => [[$.number, $.operator]],
 
@@ -128,6 +129,7 @@ module.exports = grammar({
           field("type", $.namespaced_identifier),
         ),
         seq(
+          optional(field("keyword", "not")),
           field("name", $.namespaced_identifier),
           "(",
           field(

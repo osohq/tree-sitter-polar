@@ -588,6 +588,22 @@
           "type": "SEQ",
           "members": [
             {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "FIELD",
+                  "name": "keyword",
+                  "content": {
+                    "type": "STRING",
+                    "value": "not"
+                  }
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
               "type": "FIELD",
               "name": "name",
               "content": {
@@ -1503,6 +1519,10 @@
     [
       "rule_functor",
       "fact_declaration"
+    ],
+    [
+      "keyword",
+      "rule_expression_functor"
     ]
   ],
   "precedences": [
