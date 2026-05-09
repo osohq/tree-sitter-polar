@@ -441,6 +441,16 @@
     "type": "rule_expression_functor",
     "named": true,
     "fields": {
+      "keyword": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "not",
+            "named": false
+          }
+        ]
+      },
       "name": {
         "multiple": false,
         "required": true,
