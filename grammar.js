@@ -10,7 +10,10 @@
 module.exports = grammar({
   name: "polar",
 
-  conflicts: ($) => [[$.dict, $.relation_declaration], [$.rule_functor, $.fact_declaration]],
+  conflicts: ($) => [
+    [$.dict, $.relation_declaration],
+    [$.rule_functor, $.fact_declaration],
+  ],
   precedences: ($) => [[$.number, $.operator]],
 
   rules: {
@@ -76,14 +79,20 @@ module.exports = grammar({
     rule_block: ($) =>
       seq(
         $.rule_functor,
-        "if",
-        repeat($.comment),
-        $.rule_expression_functor,
-        repeat($.comment),
-        repeat(seq(
-          choice("and", "or"),
-          repeat($.comment),
-          $.rule_expression_functor)
+        optional(
+          seq(
+            "if",
+            repeat($.comment),
+            $.rule_expression_functor,
+            repeat($.comment),
+            repeat(
+              seq(
+                choice("and", "or"),
+                repeat($.comment),
+                $.rule_expression_functor,
+              ),
+            ),
+          ),
         ),
         ";",
       ),
@@ -140,11 +149,16 @@ module.exports = grammar({
         "}",
       ),
 
-    value: ($) => choice($.string, $.number, $.boolean),
+    value: ($) => choice($.string, $.number, $.boolean, "_"),
 
     list: ($) => seq("[", repeat(choice($.term, ",")), "]"),
 
-    dict: ($) => seq("{", repeat(choice($.comment, seq($.dict_field, optional(",")))), "}"),
+    dict: ($) =>
+      seq(
+        "{",
+        repeat(choice($.comment, seq($.dict_field, optional(",")))),
+        "}",
+      ),
     dict_field: ($) =>
       seq(
         field("key", $.identifier),
@@ -163,7 +177,12 @@ module.exports = grammar({
     inline_query: ($) => seq("?=", $.term, ";"),
 
     shorthand_rule: ($) =>
-      seq($.string, "if", choice(repeat($.term), $.rule_expression_functor), ";"),
+      seq(
+        $.string,
+        "if",
+        choice(repeat($.term), $.rule_expression_functor),
+        ";",
+      ),
 
     resource_block: ($) =>
       seq(
@@ -210,7 +229,12 @@ module.exports = grammar({
     test_header: ($) => seq(field("keyword", "test"), field("name", $.string)),
 
     test_setup: ($) =>
-      seq("setup", "{", repeat(choice($.fact_declaration, $.comment, $.fixture)), "}"),
+      seq(
+        "setup",
+        "{",
+        repeat(choice($.fact_declaration, $.comment, $.fixture)),
+        "}",
+      ),
 
     fact_declaration: ($) =>
       seq(

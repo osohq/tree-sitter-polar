@@ -364,58 +364,71 @@
           "name": "rule_functor"
         },
         {
-          "type": "STRING",
-          "value": "if"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "comment"
-          }
-        },
-        {
-          "type": "SYMBOL",
-          "name": "rule_expression_functor"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "comment"
-          }
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "and"
-                  },
-                  {
-                    "type": "STRING",
-                    "value": "or"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "if"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "comment"
                   }
-                ]
-              },
-              {
-                "type": "REPEAT",
-                "content": {
+                },
+                {
                   "type": "SYMBOL",
-                  "name": "comment"
+                  "name": "rule_expression_functor"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "comment"
+                  }
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "STRING",
+                            "value": "and"
+                          },
+                          {
+                            "type": "STRING",
+                            "value": "or"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "REPEAT",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "comment"
+                        }
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "rule_expression_functor"
+                      }
+                    ]
+                  }
                 }
-              },
-              {
-                "type": "SYMBOL",
-                "name": "rule_expression_functor"
-              }
-            ]
-          }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -692,6 +705,10 @@
         {
           "type": "SYMBOL",
           "name": "boolean"
+        },
+        {
+          "type": "STRING",
+          "value": "_"
         }
       ]
     },

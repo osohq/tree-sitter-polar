@@ -3,7 +3,7 @@ actor User { #uses?
   roles=["reader", "writer"]; relations = { parent: Organization };
 }
 
-
+negation_hack(_, _, );
 
 
 has_permission(user:User, "edit", organization: Organization) if has_role(user,"admin",organization) or has_role(user,"superadmin", organization);
