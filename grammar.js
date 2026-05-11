@@ -11,9 +11,9 @@ module.exports = grammar({
   name: "polar",
 
   conflicts: ($) => [
-    [$.dict, $.relation_declaration],
     [$.rule_functor, $.fact_declaration],
     [$.keyword, $.rule_expression_functor],
+    [$.rule_expression_functor, $.term],
   ],
   precedences: ($) => [[$.number, $.operator]],
 
@@ -138,6 +138,21 @@ module.exports = grammar({
             seq(
               choice($.value, $.identifier),
               optional(repeat(seq(",", choice($.value, $.identifier)))),
+            ),
+          ),
+          ")",
+        ),
+        seq(
+          optional(field("keyword", "not")),
+          "(",
+          repeat($.comment),
+          $.rule_expression_functor,
+          repeat($.comment),
+          repeat(
+            seq(
+              choice("and", "or"),
+              repeat($.comment),
+              $.rule_expression_functor,
             ),
           ),
           ")",

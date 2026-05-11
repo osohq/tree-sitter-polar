@@ -679,6 +679,85 @@
               "value": ")"
             }
           ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "FIELD",
+                  "name": "keyword",
+                  "content": {
+                    "type": "STRING",
+                    "value": "not"
+                  }
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "STRING",
+              "value": "("
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "comment"
+              }
+            },
+            {
+              "type": "SYMBOL",
+              "name": "rule_expression_functor"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SYMBOL",
+                "name": "comment"
+              }
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "and"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "or"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "comment"
+                    }
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "rule_expression_functor"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "STRING",
+              "value": ")"
+            }
+          ]
         }
       ]
     },
@@ -1575,16 +1654,16 @@
   ],
   "conflicts": [
     [
-      "dict",
-      "relation_declaration"
-    ],
-    [
       "rule_functor",
       "fact_declaration"
     ],
     [
       "keyword",
       "rule_expression_functor"
+    ],
+    [
+      "rule_expression_functor",
+      "term"
     ]
   ],
   "precedences": [
