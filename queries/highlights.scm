@@ -1,5 +1,6 @@
 ; highlights.scm
 [
+  "assert"
   "cut"
   "or"
   "debug"
@@ -7,6 +8,7 @@
   "in"
   "forall"
   "if"
+  "iff"
   "and"
   "of"
   "not"
