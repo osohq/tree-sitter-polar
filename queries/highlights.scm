@@ -72,3 +72,8 @@
 
 (test_setup
   "setup" @module)
+
+(assertion
+    parameters: (_)*
+    (specializer
+      type: (namespaced_identifier) @type))
