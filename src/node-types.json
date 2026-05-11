@@ -489,7 +489,7 @@
       },
       "name": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "namespaced_identifier",
@@ -525,6 +525,20 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "rule_expression_functor",
+          "named": true
+        }
+      ]
     }
   },
   {
