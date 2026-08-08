@@ -17,4 +17,14 @@ jobs:
       - uses: tree-sitter/setup-action@v2
       - name: Check
         run: make checkquery
+  test:
+    name: Test grammar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: tree-sitter/setup-action@v2
+      - name: Run corpus tests
+        run: make test
+      - name: Test the Rust binding
+        run: cargo test
 
