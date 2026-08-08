@@ -4,12 +4,18 @@
 (rule_functor
   name: (namespaced_identifier) @name) @definition.function
 
-(rule_expression_functor
+(declare_statement
+  name: (namespaced_identifier) @name) @definition.function
+
+(call
   name: (namespaced_identifier) @name) @reference.call
 
 (test_block
   (test_header
     name: (string) @name)) @definition.module
+
+(test_fixture
+  name: (namespaced_identifier) @name) @definition.module
 
 (test_setup
   "setup" @name) @definition.module

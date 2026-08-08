@@ -1,0 +1,267 @@
+===
+Bare variable rule head
+===
+
+allow(actor, action, resource) if
+    has_permission(actor, action, resource);
+
+---
+
+(source_file
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier)))
+      (parameter
+        (term
+          (namespaced_identifier)))
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (call
+        (namespaced_identifier)
+        (term
+          (namespaced_identifier))
+        (term
+          (namespaced_identifier))
+        (term
+          (namespaced_identifier))))))
+
+===
+Empty-bodied rule (fact)
+===
+
+has_role(User{"alice"}, "admin", Organization{"acme"});
+
+---
+
+(source_file
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (object_literal
+            (namespaced_identifier)
+            (value
+              (string)))))
+      (parameter
+        (term
+          (value
+            (string))))
+      (parameter
+        (term
+          (object_literal
+            (namespaced_identifier)
+            (value
+              (string))))))))
+
+===
+Rule body expressions
+===
+
+f(x) if true = x;
+is_not(x, y) if x != y;
+has_permission(_: Actor, "foo", x: Integer) if fact(y) and x < y;
+m(x) if x matches Repo;
+i(x) if x in ["a", "b"];
+
+---
+
+(source_file
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (unify_expression
+        (term
+          (value
+            (boolean)))
+        (term
+          (namespaced_identifier)))))
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier)))
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (comparison_expression
+        (term
+          (namespaced_identifier))
+        (comparison_operator)
+        (term
+          (namespaced_identifier)))))
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (specializer
+          (namespaced_identifier)
+          (namespaced_identifier)))
+      (parameter
+        (term
+          (value
+            (string))))
+      (parameter
+        (specializer
+          (namespaced_identifier)
+          (namespaced_identifier))))
+    (expression
+      (binary_expression
+        (expression
+          (call
+            (namespaced_identifier)
+            (term
+              (namespaced_identifier))))
+        (expression
+          (comparison_expression
+            (term
+              (namespaced_identifier))
+            (comparison_operator)
+            (term
+              (namespaced_identifier)))))))
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (matches_expression
+        (namespaced_identifier)
+        (namespaced_identifier))))
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (in_expression
+        (term
+          (namespaced_identifier))
+        (list
+          (term
+            (value
+              (string)))
+          (term
+            (value
+              (string))))))))
+
+===
+Negation and grouping
+===
+
+g(user, doc) if
+    not (role matches String and
+        requires_role(doc, role) and
+        not has_role(user, role));
+
+---
+
+(source_file
+  (rule_block
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier)))
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (not_expression
+        (expression
+          (paren_expression
+            (expression
+              (binary_expression
+                (expression
+                  (binary_expression
+                    (expression
+                      (matches_expression
+                        (namespaced_identifier)
+                        (namespaced_identifier)))
+                    (expression
+                      (call
+                        (namespaced_identifier)
+                        (term
+                          (namespaced_identifier))
+                        (term
+                          (namespaced_identifier))))))
+                (expression
+                  (not_expression
+                    (expression
+                      (call
+                        (namespaced_identifier)
+                        (term
+                          (namespaced_identifier))
+                        (term
+                          (namespaced_identifier))))))))))))))
+
+===
+Rule flags
+===
+
+@someflag f(x) if g(x);
+@anotherflag @someflag h(x) if g(x);
+
+---
+
+(source_file
+  (rule_block
+    (rule_flags
+      (rule_flag))
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (call
+        (namespaced_identifier)
+        (term
+          (namespaced_identifier)))))
+  (rule_block
+    (rule_flags
+      (rule_flag)
+      (rule_flag))
+    (rule_functor
+      (namespaced_identifier)
+      (parameter
+        (term
+          (namespaced_identifier))))
+    (expression
+      (call
+        (namespaced_identifier)
+        (term
+          (namespaced_identifier))))))
+
+===
+Declare statement
+===
+
+declare is_related_to(Issue, Issue);
+declare has_relation(Database, String, Project);
+
+---
+
+(source_file
+  (declare_statement
+    (namespaced_identifier)
+    (namespaced_identifier)
+    (namespaced_identifier))
+  (declare_statement
+    (namespaced_identifier)
+    (namespaced_identifier)
+    (namespaced_identifier)
+    (namespaced_identifier)))

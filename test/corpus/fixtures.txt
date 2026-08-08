@@ -1,0 +1,177 @@
+===
+Test fixture definition and reference
+===
+
+test fixture basics {
+    has_role(User{"alice"}, "admin", Organization{"acme"});
+    has_role(User{"bob"}, "member", Organization{"acme"});
+}
+
+test "roles work" {
+    setup {
+        fixture basics;
+        has_role(User{"carol"}, "member", Organization{"acme"});
+    }
+
+    assert allow(User{"alice"}, "read", Organization{"acme"});
+    assert_not allow(User{"bob"}, "delete", Organization{"acme"});
+}
+
+---
+
+(source_file
+  (test_fixture
+    (namespaced_identifier)
+    (fact_declaration
+      (namespaced_identifier)
+      (fact_argument
+        (object_literal
+          (namespaced_identifier)
+          (value
+            (string))))
+      (fact_argument
+        (value
+          (string)))
+      (fact_argument
+        (object_literal
+          (namespaced_identifier)
+          (value
+            (string)))))
+    (fact_declaration
+      (namespaced_identifier)
+      (fact_argument
+        (object_literal
+          (namespaced_identifier)
+          (value
+            (string))))
+      (fact_argument
+        (value
+          (string)))
+      (fact_argument
+        (object_literal
+          (namespaced_identifier)
+          (value
+            (string))))))
+  (test_block
+    (test_header
+      (string))
+    (test_setup
+      (fixture_reference
+        (namespaced_identifier))
+      (fact_declaration
+        (namespaced_identifier)
+        (fact_argument
+          (object_literal
+            (namespaced_identifier)
+            (value
+              (string))))
+        (fact_argument
+          (value
+            (string)))
+        (fact_argument
+          (object_literal
+            (namespaced_identifier)
+            (value
+              (string))))))
+    (assertion
+      (rule_functor
+        (namespaced_identifier)
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))
+        (parameter
+          (term
+            (value
+              (string))))
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))))
+    (assertion
+      (rule_functor
+        (namespaced_identifier)
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))
+        (parameter
+          (term
+            (value
+              (string))))
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))))))
+
+===
+Assertion with iff clause
+===
+
+test "iff assertions" {
+    setup {
+        has_role(User{"alice"}, "admin", Organization{"acme"});
+    }
+
+    assert actions(User{"alice"}, Organization{"acme"}, actions) iff actions in ["read", "delete"];
+}
+
+---
+
+(source_file
+  (test_block
+    (test_header
+      (string))
+    (test_setup
+      (fact_declaration
+        (namespaced_identifier)
+        (fact_argument
+          (object_literal
+            (namespaced_identifier)
+            (value
+              (string))))
+        (fact_argument
+          (value
+            (string)))
+        (fact_argument
+          (object_literal
+            (namespaced_identifier)
+            (value
+              (string))))))
+    (assertion
+      (rule_functor
+        (namespaced_identifier)
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))
+        (parameter
+          (term
+            (namespaced_identifier))))
+      (expression
+        (in_expression
+          (term
+            (namespaced_identifier))
+          (list
+            (term
+              (value
+                (string)))
+            (term
+              (value
+                (string)))))))))
