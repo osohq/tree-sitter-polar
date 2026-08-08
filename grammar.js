@@ -59,8 +59,9 @@ module.exports = grammar({
       ),
 
     comment: ($) => token(seq("#", /.*/)),
-    // Strings are single-line, backslash escapes any character.
-    string: ($) => token(seq('"', /(?:[^"\\\n]|\\[^\n])*/, '"')),
+    // Backslash escapes any character, including a newline; unescaped
+    // newlines end the string.
+    string: ($) => token(seq('"', /(?:[^"\\\n]|\\[\s\S])*/, '"')),
     // The Polar lexer accepts any character that is not ASCII punctuation or
     // whitespace in a symbol (including unicode), plus `_`, `::`-separated
     // segments, and an optional trailing `?`.
@@ -344,7 +345,7 @@ module.exports = grammar({
         field("header", $.test_header),
         "{",
         optional($.test_setup),
-        repeat($.assertion),
+        repeat1($.assertion),
         "}",
       ),
 

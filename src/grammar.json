@@ -66,7 +66,7 @@
           },
           {
             "type": "PATTERN",
-            "value": "(?:[^\"\\\\\\n]|\\\\[^\\n])*"
+            "value": "(?:[^\"\\\\\\n]|\\\\[\\s\\S])*"
           },
           {
             "type": "STRING",
@@ -1604,7 +1604,7 @@
           ]
         },
         {
-          "type": "REPEAT",
+          "type": "REPEAT1",
           "content": {
             "type": "SYMBOL",
             "name": "assertion"
