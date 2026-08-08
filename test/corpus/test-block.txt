@@ -8,6 +8,8 @@ test "Organization" {
     has_role(User{"alice"}, "viewer", Organization{"example"});
     has_role(User{"bob"}, "owner", Organization{"example"});
   }
+
+  assert has_role(User{"bob"}, "owner", Organization{"example"});
 }
 
 ---
@@ -47,4 +49,23 @@ test "Organization" {
           (object_literal
             (namespaced_identifier)
             (value
-              (string))))))))
+              (string))))))
+    (assertion
+      (rule_functor
+        (namespaced_identifier)
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))
+        (parameter
+          (term
+            (value
+              (string))))
+        (parameter
+          (term
+            (object_literal
+              (namespaced_identifier)
+              (value
+                (string)))))))))
