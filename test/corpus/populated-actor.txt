@@ -3,7 +3,7 @@ Populated Actor
 ===
 
 actor User {
-  roles = ["reader", "writer"]
+  roles = ["reader", "writer"];
   relations = { parent: Organization };
 }
 
@@ -13,18 +13,20 @@ actor User {
   (resource_block
     (resource_type)
     (namespaced_identifier)
-    (term
-      (declaration
-        (assignment_operator)
-        (list
-          (term
-            (string))
-          (term
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (list
+        (term
+          (value
+            (string)))
+        (term
+          (value
             (string)))))
-    (term
-      (declaration
-        (assignment_operator)
-        (dict
-          (dict_field
-            (identifier)
-            (namespaced_identifier)))))))
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (dict
+        (dict_field
+          (namespaced_identifier)
+          (namespaced_identifier))))))

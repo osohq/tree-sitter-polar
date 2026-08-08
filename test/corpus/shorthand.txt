@@ -1,0 +1,174 @@
+===
+Shorthand rule variants
+===
+
+resource OrgUnit {
+    roles = ["admin", "member"];
+    permissions = ["read"];
+    relations = { parent: OrgUnit };
+
+    "read" if "member";
+    "member" if "admin";
+    "admin" if "admin" on "parent";
+    role if role on "parent";
+    "read" if global "admin";
+    permission if permission on "parent";
+}
+
+---
+
+(source_file
+  (resource_block
+    (resource_type)
+    (namespaced_identifier)
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (list
+        (term
+          (value
+            (string)))
+        (term
+          (value
+            (string)))))
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (list
+        (term
+          (value
+            (string)))))
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (dict
+        (dict_field
+          (namespaced_identifier)
+          (namespaced_identifier))))
+    (shorthand_rule
+      (term
+        (value
+          (string)))
+      (shorthand_expression
+        (short_term
+          (string))))
+    (shorthand_rule
+      (term
+        (value
+          (string)))
+      (shorthand_expression
+        (short_term
+          (string))))
+    (shorthand_rule
+      (term
+        (value
+          (string)))
+      (shorthand_expression
+        (on_expression
+          (short_term
+            (string))
+          (short_term
+            (string)))))
+    (shorthand_rule
+      (term
+        (namespaced_identifier))
+      (shorthand_expression
+        (on_expression
+          (short_term
+            (namespaced_identifier))
+          (short_term
+            (string)))))
+    (shorthand_rule
+      (term
+        (value
+          (string)))
+      (shorthand_expression
+        (global_expression
+          (short_term
+            (string)))))
+    (shorthand_rule
+      (term
+        (namespaced_identifier))
+      (shorthand_expression
+        (on_expression
+          (short_term
+            (namespaced_identifier))
+          (short_term
+            (string)))))))
+
+===
+Shorthand rule with call and grouping
+===
+
+resource Doc {
+    permissions = ["read"];
+
+    "read" if is_public(resource) or ("member" and is_visible(resource));
+}
+
+---
+
+(source_file
+  (resource_block
+    (resource_type)
+    (namespaced_identifier)
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (list
+        (term
+          (value
+            (string)))))
+    (shorthand_rule
+      (term
+        (value
+          (string)))
+      (shorthand_expression
+        (shorthand_expression
+          (call
+            (namespaced_identifier)
+            (term
+              (namespaced_identifier))))
+        (shorthand_expression
+          (shorthand_expression
+            (shorthand_expression
+              (short_term
+                (string)))
+            (shorthand_expression
+              (call
+                (namespaced_identifier)
+                (term
+                  (namespaced_identifier))))))))))
+
+===
+Resource block with extends
+===
+
+resource Child extends Parent, GrandParent {
+    permissions = ["read"];
+
+    "read" if "member";
+}
+
+---
+
+(source_file
+  (resource_block
+    (resource_type)
+    (namespaced_identifier)
+    (namespaced_identifier)
+    (namespaced_identifier)
+    (declaration
+      (namespaced_identifier)
+      (assignment_operator)
+      (list
+        (term
+          (value
+            (string)))))
+    (shorthand_rule
+      (term
+        (value
+          (string)))
+      (shorthand_expression
+        (short_term
+          (string))))))

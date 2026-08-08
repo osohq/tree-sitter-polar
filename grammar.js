@@ -7,33 +7,72 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
+/**
+ * A mapping of keyword precedence for the parser. Mirrors the precedence rules
+ * in the Polar parser.
+ */
+const PREC = {
+  or: 1,
+  and: 2,
+  not: 3,
+  unify: 4,
+  comparison: 4,
+  in: 5,
+  matches: 5,
+};
+
+/**
+ * Comma-separated list of `rule`, no trailing comma.
+ */
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(",", rule)));
+}
+
+/**
+ * Comma-separated list of `rule` with an optional trailing comma.
+ */
+function commaSep1Trailing(rule) {
+  return seq(rule, repeat(seq(",", rule)), optional(","));
+}
+
 module.exports = grammar({
   name: "polar",
 
-  conflicts: ($) => [
-    [$.rule_functor, $.fact_declaration],
-    [$.keyword, $.rule_expression_functor],
-    [$.rule_expression_functor, $.term],
-  ],
-  precedences: ($) => [[$.number, $.operator]],
+  extras: ($) => [/\s/, $.comment],
+
+  word: ($) => $.namespaced_identifier,
+
+  conflicts: ($) => [],
 
   rules: {
     source_file: ($) =>
       repeat(
         choice(
           $.resource_block,
-          $.comment,
           $.rule_block,
           $.rule_type,
-          $.fact_declaration,
+          $.declare_statement,
           $.inline_query,
+          $.test_fixture,
           $.test_block,
         ),
       ),
+
     comment: ($) => token(seq("#", /.*/)),
-    string: ($) => seq('"', /[^"]*/, '"'),
-    identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*/,
-    namespaced_identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*(?:::[a-zA-Z0-9_]+)*/,
+    // Strings are single-line, backslash escapes any character.
+    string: ($) => token(seq('"', /(?:[^"\\\n]|\\[^\n])*/, '"')),
+    // The Polar lexer accepts any character that is not ASCII punctuation or
+    // whitespace in a symbol (including unicode), plus `_`, `::`-separated
+    // segments, and an optional trailing `?`.
+    namespaced_identifier: ($) =>
+      token(
+        seq(
+          /[^!-\/:-@\[-\^`{-~\s0-9]/,
+          /[^!-\/:-@\[-\^`{-~\s]*/,
+          repeat(seq("::", /[^!-\/:-@\[-\^`{-~\s]+/)),
+          optional("?"),
+        ),
+      ),
 
     number: ($) =>
       seq(
@@ -53,112 +92,9 @@ module.exports = grammar({
 
     boolean: ($) => choice("true", "false"),
 
-    keyword: ($) =>
-      choice(
-        "cut",
-        "or",
-        "debug",
-        "print",
-        "in",
-        "forall",
-        "if",
-        "iff",
-        "and",
-        "of",
-        "not",
-        "matches",
-        "type",
-        "on",
-        "global",
-      ),
+    current_unix_time: ($) => "@current_unix_time",
 
-    operator: ($) => choice("+", "-", "*", "/", "<", ">", "=", "!"),
-    assignment_operator: ($) => "=",
-
-    rule_type: ($) => seq("type", $.rule_functor, ";"),
-    resource_type: ($) => choice("actor", "resource"),
-
-    rule_block: ($) =>
-      seq(
-        $.rule_functor,
-        optional(
-          seq(
-            "if",
-            repeat($.comment),
-            $.rule_expression_functor,
-            repeat($.comment),
-            repeat(
-              seq(
-                choice("and", "or"),
-                repeat($.comment),
-                $.rule_expression_functor,
-              ),
-            ),
-          ),
-        ),
-        ";",
-      ),
-
-    rule: ($) =>
-      seq(
-        choice(
-          $.rule_functor,
-          seq("if", choice($.term, $.rule_expression_functor), ";"),
-          ";",
-        ),
-      ),
-
-    rule_functor: ($) =>
-      seq(
-        field("name", $.namespaced_identifier),
-        "(",
-        field(
-          "parameters",
-          seq(
-            choice($.specializer, $.value),
-            optional(repeat(seq(",", choice($.specializer, $.value)))),
-          ),
-        ),
-        ")",
-      ),
-
-    rule_expression_functor: ($) =>
-      choice(
-        seq(
-          field("name", $.namespaced_identifier),
-          "matches",
-          field("type", $.namespaced_identifier),
-        ),
-        seq(
-          optional(field("keyword", "not")),
-          field("name", $.namespaced_identifier),
-          "(",
-          field(
-            "parameters",
-            seq(
-              choice($.value, $.identifier),
-              optional(repeat(seq(",", choice($.value, $.identifier)))),
-            ),
-          ),
-          ")",
-        ),
-        seq(
-          optional(field("keyword", "not")),
-          "(",
-          repeat($.comment),
-          $.rule_expression_functor,
-          repeat($.comment),
-          repeat(
-            seq(
-              choice("and", "or"),
-              repeat($.comment),
-              $.rule_expression_functor,
-            ),
-          ),
-          ")",
-        ),
-      ),
-
+    // `Tag{"id"}`, `Integer{1}`, `Boolean{true}`
     object_literal: ($) =>
       seq(
         field("name", $.namespaced_identifier),
@@ -167,23 +103,26 @@ module.exports = grammar({
         "}",
       ),
 
-    value: ($) => choice($.string, $.number, $.boolean, "_"),
+    // ConcreteValue, minus object literals
+    value: ($) => choice($.string, $.number, $.boolean),
 
-    list: ($) => seq("[", repeat(choice($.term, ",")), "]"),
-
-    dict: ($) =>
-      seq(
-        "{",
-        repeat(choice($.comment, seq($.dict_field, optional(",")))),
-        "}",
+    // Any value a rule parameter or expression operand can hold
+    term: ($) =>
+      choice(
+        $.value,
+        $.object_literal,
+        $.current_unix_time,
+        $.namespaced_identifier,
       ),
+
+    list: ($) => seq("[", optional(commaSep1Trailing($.term)), "]"),
+
+    dict: ($) => seq("{", optional(commaSep1Trailing($.dict_field)), "}"),
     dict_field: ($) =>
       seq(
-        field("key", $.identifier),
-        ":",
-        field("value", $.namespaced_identifier),
+        field("key", $.namespaced_identifier),
+        optional(seq(":", field("value", $.namespaced_identifier))),
       ),
-    parens: ($) => seq("(", repeat($.term), ")"),
 
     specializer: ($) =>
       seq(
@@ -192,19 +131,127 @@ module.exports = grammar({
         field("type", $.namespaced_identifier),
       ),
 
-    inline_query: ($) => seq("?=", $.term, ";"),
+    // Rule flags are for internal use only. Accept any `@`-prefixed identifier
+    // rather than enumerating them.
+    rule_flags: ($) => repeat1($.rule_flag),
+    rule_flag: ($) =>
+      token(seq("@", /[^!-\/:-@\[-\^`{-~\s0-9][^!-\/:-@\[-\^`{-~\s]*/)),
 
-    shorthand_rule: ($) =>
+    rule_functor: ($) =>
       seq(
-        $.string,
-        "if",
-        choice(repeat($.term), $.rule_expression_functor),
+        field("name", $.namespaced_identifier),
+        "(",
+        optional(field("parameters", commaSep1($.parameter))),
+        ")",
+      ),
+
+    parameter: ($) => choice($.specializer, $.term),
+
+    rule_block: ($) =>
+      seq(
+        optional($.rule_flags),
+        $.rule_functor,
+        optional(seq("if", field("body", $.expression))),
         ";",
       ),
 
+    rule_type: ($) => seq("type", $.rule_functor, ";"),
+
+    declare_statement: ($) =>
+      seq(
+        "declare",
+        field("name", $.namespaced_identifier),
+        "(",
+        optional(commaSep1($.namespaced_identifier)),
+        ")",
+        ";",
+      ),
+
+    inline_query: ($) => seq("?=", $.expression, ";"),
+
+    expression: ($) =>
+      choice(
+        $.binary_expression,
+        $.not_expression,
+        $.unify_expression,
+        $.comparison_expression,
+        $.in_expression,
+        $.matches_expression,
+        $.call,
+        $.boolean,
+        $.paren_expression,
+      ),
+
+    binary_expression: ($) =>
+      choice(
+        prec.left(
+          PREC.or,
+          seq(
+            field("left", $.expression),
+            field("operator", "or"),
+            field("right", $.expression),
+          ),
+        ),
+        prec.left(
+          PREC.and,
+          seq(
+            field("left", $.expression),
+            field("operator", "and"),
+            field("right", $.expression),
+          ),
+        ),
+      ),
+
+    not_expression: ($) => prec(PREC.not, seq("not", $.expression)),
+
+    unify_expression: ($) =>
+      prec.left(
+        PREC.unify,
+        seq(field("left", $.term), "=", field("right", $.term)),
+      ),
+
+    comparison_operator: ($) => choice(">", ">=", "<", "<=", "!="),
+
+    comparison_expression: ($) =>
+      prec.left(
+        PREC.comparison,
+        seq(
+          field("left", $.term),
+          field("operator", $.comparison_operator),
+          field("right", $.term),
+        ),
+      ),
+
+    in_expression: ($) =>
+      prec.left(
+        PREC.in,
+        seq(field("item", $.term), "in", field("iterator", $.list)),
+      ),
+
+    matches_expression: ($) =>
+      prec(
+        PREC.matches,
+        seq(
+          field("name", $.namespaced_identifier),
+          field("operator", choice("matches", "matches!")),
+          field("type", $.namespaced_identifier),
+        ),
+      ),
+
+    call: ($) =>
+      seq(
+        field("name", $.namespaced_identifier),
+        "(",
+        optional(field("arguments", commaSep1($.term))),
+        ")",
+      ),
+
+    paren_expression: ($) => seq("(", $.expression, ")"),
+
+    resource_type: ($) => choice("actor", "resource"),
+
     resource_block: ($) =>
       seq(
-        optional(field("identifier", $.namespaced_identifier)),
         choice(
           seq(
             $.resource_type,
@@ -212,7 +259,9 @@ module.exports = grammar({
             optional(
               seq(
                 field("keyword", "extends"),
-                field("identifier", $.namespaced_identifier),
+                commaSep1Trailing(
+                  field("extends", $.namespaced_identifier),
+                ),
               ),
             ),
           ),
@@ -220,27 +269,82 @@ module.exports = grammar({
         ),
         field("scope_start", "{"),
         repeat(
-          seq(
-            choice(
-              seq($.relation_declaration, field("expression_end", ";")),
-              seq($.declaration, field("expression_end", ";")),
-              $.shorthand_rule,
-              $.comment,
-            ),
+          choice(
+            seq($.declaration, field("expression_end", ";")),
+            $.shorthand_rule,
           ),
         ),
         field("scope_end", "}"),
       ),
 
-    relation_declaration: ($) =>
-      seq("{", repeat(choice($.specializer, $.comment, ",")), "}"),
+    // `roles = [...]`, `relations = { ... }`
+    declaration: ($) =>
+      seq(
+        field("key", $.namespaced_identifier),
+        $.assignment_operator,
+        choice($.list, $.dict),
+      ),
+
+    assignment_operator: ($) => "=",
+
+    shorthand_rule: ($) =>
+      seq(
+        optional($.rule_flags),
+        field("head", $.term),
+        "if",
+        field("body", $.shorthand_expression),
+        ";",
+      ),
+
+    shorthand_expression: ($) =>
+      choice(
+        prec.left(
+          PREC.or,
+          seq(
+            field("left", $.shorthand_expression),
+            field("operator", "or"),
+            field("right", $.shorthand_expression),
+          ),
+        ),
+        prec.left(
+          PREC.and,
+          seq(
+            field("left", $.shorthand_expression),
+            field("operator", "and"),
+            field("right", $.shorthand_expression),
+          ),
+        ),
+        $.call,
+        $.global_expression,
+        $.on_expression,
+        $.short_term,
+        seq("(", $.shorthand_expression, ")"),
+      ),
+
+    on_expression: ($) =>
+      seq(field("left", $.short_term), "on", field("right", $.short_term)),
+
+    global_expression: ($) => seq("global", $.short_term),
+
+    short_term: ($) => choice($.namespaced_identifier, $.string),
+
+    fact_declaration: ($) =>
+      seq(
+        field("name", $.namespaced_identifier),
+        "(",
+        optional(field("parameters", commaSep1($.fact_argument))),
+        ")",
+        ";",
+      ),
+
+    fact_argument: ($) => choice($.value, $.object_literal),
 
     test_block: ($) =>
       seq(
         field("header", $.test_header),
         "{",
-        repeat($.comment),
-        optional(seq($.test_setup, repeat(choice($.assertion, $.comment)))),
+        optional($.test_setup),
+        repeat($.assertion),
         "}",
       ),
 
@@ -250,71 +354,29 @@ module.exports = grammar({
       seq(
         "setup",
         "{",
-        repeat(choice($.fact_declaration, $.comment, $.fixture)),
+        repeat(choice($.fact_declaration, $.fixture_reference)),
         "}",
       ),
 
-    fact_declaration: ($) =>
+    fixture_reference: ($) =>
+      seq("fixture", field("name", $.namespaced_identifier), ";"),
+
+    test_fixture: ($) =>
       seq(
+        field("keyword", "test"),
+        field("kind", "fixture"),
         field("name", $.namespaced_identifier),
-        "(",
-        field(
-          "parameters",
-          seq(
-            choice($.object_literal, $.value),
-            repeat(seq(",", choice($.object_literal, $.value))),
-          ),
-        ),
-        ")",
-        ";",
+        "{",
+        repeat($.fact_declaration),
+        "}",
       ),
 
     assertion: ($) =>
       seq(
         field("keyword", choice("assert", "assert_not")),
-        field("predicate", $.identifier),
-        "(",
-        field(
-          "parameters",
-          seq(
-            choice($.object_literal, $.specializer, $.value),
-            repeat(seq(",", choice($.object_literal, $.specializer, $.value))),
-          ),
-        ),
-        ")",
-        optional(
-          seq(
-            field("keyword", "iff"),
-            field("name", $.namespaced_identifier),
-            field("keyword", choice("in", "not in")),
-            $.list,
-          ),
-        ),
+        field("head", $.rule_functor),
+        optional(seq(field("keyword", "iff"), field("condition", $.expression))),
         ";",
-      ),
-
-    fixture: ($) => seq("test", repeat(choice($.comment, $.rule)), "fixture"),
-
-    declaration: ($) =>
-      seq(
-        choice("relations", "permissions", field("keyword", "roles")),
-        $.assignment_operator,
-        choice($.list, $.dict),
-      ),
-
-    term: ($) =>
-      choice(
-        $.comment,
-        $.string,
-        $.number,
-        $.keyword,
-        $.declaration,
-        $.operator,
-        $.boolean,
-        $.object_literal,
-        $.list,
-        $.dict,
-        $.parens,
       ),
   },
 });

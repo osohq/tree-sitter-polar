@@ -7,12 +7,10 @@
 
 (rule_functor) @local.scope
 
-(rule_functor
-  parameters: (specializer
-    name: (namespaced_identifier) @local.definition))
+(specializer
+  name: (namespaced_identifier) @local.definition)
 
-(rule_functor
-  parameters: (specializer
-    type: (namespaced_identifier) @local.reference))
+(specializer
+  type: (namespaced_identifier) @local.reference)
 
 (test_block) @local.scope
